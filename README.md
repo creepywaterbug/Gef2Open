@@ -6,6 +6,6 @@ Zover bekend is Deltares niet bereid de broncode van Gef2.dll aan het publiek be
 
 Er is een handleiding Gef2Open [beschikbaar](http://gef2open.readthedocs.org)
 
-Issues kunnen [hier worden ingediend](https://www.github.org)
+Issues kunnen [hier worden ingediend](https://github.com/creepywaterbug/Gef2Open/issues)
 
 Veel plezier, waterbug
