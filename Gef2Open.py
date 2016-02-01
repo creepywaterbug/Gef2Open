@@ -1,5 +1,5 @@
 #!env/bin/python
-# Datum:  1 Februari 2015
+# Datum:  1 Februari 2016
 # Waterbug,waterbug@bitmessage.ch
 
 import re
@@ -550,12 +550,6 @@ def read_gef(i_sBestandGef):
     except IndexError:
         print ("%s Headerdict() in UtlGefOpen.py geef IndexError: fout bij uitlezen gef"%os.path.basename(i_sBestandGef))
         return False 
-
-# Purpose: Of een bepaald aspect van een bestand correct is
-# Parms  : Toegestaan: 'HEADER', 'DATA', 'GEF-CPT-Report','GEF-BORE-Report'
-def test_gef(i_sAspect):
-	headerdict=ast.literal_eval(pickle.load(open("tmpheaderdict.pkl")))
-	return 'datmoetenwenogeensuitzoeken'
 
 # Purpose: Of een bestand geplot kan worden
 def is_plotable():
