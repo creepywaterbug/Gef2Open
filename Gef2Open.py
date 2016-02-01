@@ -20,6 +20,7 @@ def removetrailers(string):
 	e=re.sub('\r\n$','',d)
 	return e
 
+# Purpose: Of een BORE-Report file is (boring)
 def gbr_is_gbr():
 	fp = open("tmpheaderdict.pkl")
 	headerdict=ast.literal_eval(pickle.load(fp))
@@ -84,7 +85,6 @@ def get_column():
 	fp = open("tmpheaderdict.pkl")
 	headerdict=ast.literal_eval(pickle.load(fp))
 	if 'COLUMN' in headerdict:
-		#if len(headerdict['COLUMN'])==1:
 		if len(headerdict['COLUMN'])>0:
 			out=headerdict['COLUMN'][0]
 	try:
@@ -204,7 +204,7 @@ def get_parent_flag():
 	fp = open("tmpheaderdict.pkl")
 	headerdict=ast.literal_eval(pickle.load(fp))
 	if ('PARENT' in headerdict): 
-		if len(headerdict['PARENT'])>0: #LETOP op meer plaatsen fout!
+		if len(headerdict['PARENT'])>0: 
 			out=True
 		else:
 			out=False
@@ -275,7 +275,7 @@ def get_projectid_Number():
 	headerdict=ast.literal_eval(pickle.load(fp))
 	if 'PROJECTID' in headerdict:
 		if len(headerdict['PROJECTID'])>1:
-			out = headerdict['PROJECTID'][1] #test rik 2015-01-07
+			out = headerdict['PROJECTID'][1] 
 	try:
 		return out
 	except:
@@ -418,7 +418,6 @@ def get_zid_flag():
 def get_zid_Z():
 	headerdict=ast.literal_eval(pickle.load(open("tmpheaderdict.pkl")))
 	if 'ZID' in headerdict: 
-		#if len(headerdict['ZID'])>0:
 		if len(headerdict['ZID'])>1:
 			out = headerdict['ZID'][1]
 	try:
@@ -448,7 +447,7 @@ def qn2column(i_iQtyNumber):
 					out = j[0]
 				if 'diepte bovenkant' in str.lower(str(j)):
 					out = j[0]
-				if 'laag van' in str.lower(str(j)): #levert in B23-101A_PB een '2' op wat niet klopt ik niet begrijp
+				if 'laag van' in str.lower(str(j)): 
 					out = j[0]
 		elif i_iQtyNumber==11:	
 			out = 0
@@ -456,7 +455,7 @@ def qn2column(i_iQtyNumber):
 				j = headerdict['COLUMNINFO'][i]
 				if 'gecorrigeerde diepte' in str.lower(str(j)) :
 					out = j[0]
-		return int(out) #is nodig ivm Get_SON_EindDiepteGegevens()
+		return int(out) 
 	except:
 		return None
 
@@ -464,7 +463,6 @@ def qn2column(i_iQtyNumber):
 def read_gef(i_sBestandGef):
     EOH=False
     try:
-    #if 1==1:
         multipars=['COLUMNINFO','COLUMNVOID','MEASUREMENTTEXT','MEASUREMENTVAR','SPECIMENVAR','SPECIMENTEXT']
         headerdict={}
         f = open(i_sBestandGef,'r')
