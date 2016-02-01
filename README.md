@@ -4,7 +4,7 @@ GEF (Geotechnical Exchange Format) is een bestandsformaat voor het opslaan en ui
 
 Zover bekend is Deltares niet bereid de broncode van Gef2.dll aan het publiek beschikbaar te stellen. Dat is jammer, want daarmee kunnen alleen ontwikkelaars op windows platforms de library gebruiken. Omdat ik zelf van plan ben Open Source tools te gaan maken voor het presenteren en analyseren van informatie uit gef-bestanden heb ik daarom besloten Gef2.dll te open-sourcen.
 
-Er is een handleiding Gef2Open [beschikbaar](http://gef2open.readthedocs.org)
+Er is een handleiding Gef2Open [beschikbaar](http://utlgefopen.readthedocs.org)
 
 Issues kunnen [hier worden ingediend](https://github.com/creepywaterbug/Gef2Open/issues)
 
