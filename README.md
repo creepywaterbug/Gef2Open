@@ -1,4 +1,4 @@
-### Gef2Open documentatie
+### Gef2Open 
 
 GEF (Geotechnical Exchange Format) is een bestandsformaat voor het opslaan en uitwisselen van geotechnische informatie. De standaard is uitvoerig beschreven in een aantal officiele documenten (zie onder 'referenties'). Deltares heeft diverse software gemaakt waarmee gef-bestanden kunnen worden geanalyseerd en gemanipuleerd. De meeste software maakt daarbij gebruik van een tevens door Deltares beschikbaar gestelde windows library (Gef2.dll).
 
