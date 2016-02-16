@@ -22,6 +22,14 @@ def tryUtlGef(mytype,functie):
 	except:
 		return 'GeenResult'
 
+def try2UtlGef(mytype,functie):
+	myresult = eval('%s.%s'%(mytype,functie))
+	if 'Error:' in myresult:
+		myresult=None
+	try:
+		return myResult 
+	except:
+		return 'GeenResult'
 # Met deze functie converteer ik functienaam van UtlGef.py naar die van 
 # Gef2.dll/Gef2Open.py Dit om te voorkomen dat ik de inhoud van andermans
 # scripts moet gaan aanpassen
@@ -74,7 +82,7 @@ def CompareGefTools(gefbestand,gefnaam,function):
 	try:
 		print 'function: %s'%(function)
 		functieGef2 = ChangetoFunctienaamGef2(function)
-		c2=tryUtlGef('Gef2Open',functieGef2)
+		c2=try2UtlGef('Gef2Open',functieGef2)
 		c3=tryUtlGef('UtlGef',function)
 		MyVglResult.write('"%s";"%s";"%s";"%s"\n'%(gefnaam,functieGef2,c2,c3))
 		return 'gelukt'
@@ -116,7 +124,7 @@ MyVglResult = open('MyVglResult.txt','w')
 mylocs=Gef2Config.Locaties()
 myFunctions = Gef2Config.Functies()
 ## Main
-#getBestanden(mylocs) # info over gefbestanden wordt geplaatst in 'MyGefFiles.txt'
+getBestanden(mylocs) # info over gefbestanden wordt geplaatst in 'MyGefFiles.txt'
 a=open('MyGefFiles.txt','r')
 mydict=ast.literal_eval(a.readlines()[0])
 a.close()
