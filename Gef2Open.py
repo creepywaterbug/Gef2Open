@@ -6,6 +6,7 @@ import re
 import os
 import pickle
 import ast
+import sys
 
 # Hulpfuncties
 def is_number(s):
@@ -87,10 +88,15 @@ def get_column():
 	if 'COLUMN' in headerdict:
 		if len(headerdict['COLUMN'])>0:
 			out=headerdict['COLUMN'][0]
+		else:
+			err='MissingValue'
+	else:
+		err='MissingKeyword'
 	try:
 		return out
 	except:
-		return None
+		#return None
+		return 'Error:%s'%(err)
 
 # Purpose: Of #COLUMN aanwezig
 def get_column_flag():
@@ -115,20 +121,35 @@ def get_companyid_Name():
 	if 'COMPANYID' in headerdict:
 		if len(headerdict['COMPANYID'])>0:
 			out=headerdict['COMPANYID'][0]
+		else:
+			err='MissingValue'
+	else:
+		err='MissingKeyword'
 	try:
 		return out
 	except:
-		return None
+		#return None
+		return 'Error:%s'%(err) 
 
 # Purpose: Geeft waarde uit bepaalde cel van data block
 def get_data(i_Kol, iRij):
 	fp = open("tmpheaderdict.pkl")
 	headerdict=ast.literal_eval(pickle.load(fp))
+	if 'datablok' in headerdict:
+		if iRij in headerdict['datablok']:
+			if i_Kol-1 in headerdict['datablok'][iRij]:
+				out=headerdict['datablok'][iRij][i_Kol-1]
+			else:
+				err='MissingKol'
+		else:
+			err='MissingRij'
+	else:
+		err='MissingDatablok'
 	try:
-		out=headerdict['datablok'][iRij][i_Kol-1] 
 		return out
 	except:
-		return None
+		#return None
+		return err 
 
 # Purpose: Of gegeven #MEASUREMENTTEXT index aanwezig
 def get_measurementtext_flag(i_Index):
@@ -166,11 +187,21 @@ def get_measurementvar_flag(i_Index):
 def get_measurementtext_Tekst(i_Index):
 	fp = open("tmpheaderdict.pkl")
 	headerdict=ast.literal_eval(pickle.load(fp))
+	if 'MEASUREMENTTEXT' in headerdict:
+		if i_Index in headerdict['MEASUREMENTTEXT']:
+			if 1 in headerdict['MEASUREMENTTEXT'][i_Index]:
+				out=headerdict['MEASUREMENTTEXT'][i_Index][1] #??
+			else:
+				err='MissingValue'
+		else:
+			err='MissingIndex'
+	else:
+		err='MissingKeyword'
 	try:
-		out=headerdict['MEASUREMENTTEXT'][i_Index][1] #??
 		return out
 	except:
-		return None
+		#return None
+		return 'Error:%s'%(err)
 
 # Purpose: Geeft measurementvar value
 def get_measurementvar_Value(i_Index):
@@ -180,10 +211,17 @@ def get_measurementvar_Value(i_Index):
 		if i_Index in headerdict['MEASUREMENTVAR']:
 			if len(headerdict['MEASUREMENTVAR'][i_Index])>0:
 		  		out = headerdict['MEASUREMENTVAR'][i_Index][1]
+			else:
+				err = 'MissingValue'
+		else:
+			err = 'MissingIndex'
+	else:
+		err = 'MissingKeyword'
 	try:
 		return out
 	except:
-		return None
+		#return None
+		return 'Error:%s'%(err)
 
 # Purpose: Geeft aantal rijen in het data block
 # neem aan waarde achter 'LASTSCAN', maar check dit!
@@ -193,10 +231,15 @@ def get_nr_scans():
 	if 'LASTSCAN' in headerdict:
 		if len(headerdict['LASTSCAN'])>0:
 			out=headerdict['LASTSCAN'][0]
+		else:
+			err='MissingValue'
+	else:
+		err='MissingKeyword'
 	try:
 		return out
 	except:
-		return None
+		#return None
+		return 'Error:%s'%(err) 
 
 # Purpose: Of #PARENT aanwezig
 # neeem aan dat er een par 'PARENT' aanwezig moet zijn. Check!
@@ -222,10 +265,14 @@ def get_parent_reference():
 	if 'PARENT' in headerdict: 
 		if len(headerdict['PARENT'])>0:
 			out=headerdict['PARENT'][0]
+		else:
+			err='MissingValue'
+	else:
+		err='MissingKeyword'
 	try:
 		return out
 	except:
-		return None
+		return 'Error:%s'%(err)
 
 # Purpose: Of #PROCEDURECODE aanwezig
 def get_procedurecode_flag():
@@ -250,10 +297,15 @@ def get_procedurecode_Code():
 	if 'PROCEDURECODE' in headerdict:
 		if len(headerdict['PROCEDURECODE'])>0:
 			out=headerdict['PROCEDURECODE'][0]
+		else:
+			err='MissingValue'
+	else:
+		err='MissingKeyword'
 	try:
 		return out
 	except:
-		return None
+		#return None
+		return 'Error:%s'%(err) 
 
 # Purpose: Of #PROJECTID aanwezig
 def get_projectid_flag():
@@ -275,11 +327,16 @@ def get_projectid_Number():
 	headerdict=ast.literal_eval(pickle.load(fp))
 	if 'PROJECTID' in headerdict:
 		if len(headerdict['PROJECTID'])>1:
-			out = headerdict['PROJECTID'][1] 
+			out = headerdict['PROJECTID'][1]
+		else:
+			err = 'MissingValue'
+	else:
+		err = 'MissingKeyword'
 	try:
 		return out
 	except:
-		return None
+		#return None
+		return 'Error:%s'%(err) 
 
 # Purpose: Of #REPORTCODE aanwezig
 def get_reportcode_flag():
@@ -304,10 +361,15 @@ def get_reportcode_Code():
 	if 'REPORTCODE' in headerdict:
 		if len(headerdict['REPORTCODE'])>0:
 			out = headerdict['REPORTCODE'][0]
+		else:
+			err = 'MissingValue'
+	else:
+		err = 'MissingKeyword'
 	try:
 		return out
 	except:
-		return None
+		#return None
+		return 'Error:%s'%(err) 
 
 # Purpose: Of #STARTDATE aanwezig
 def get_startdate_flag():
@@ -332,10 +394,15 @@ def get_startdate_Yyyy():
 	if 'STARTDATE' in headerdict: 
 		if len(headerdict['STARTDATE'])>2:
 			out = int(headerdict['STARTDATE'][0])
+		else:
+			err = 'MissingValue'
+	else:
+		err = 'MissingKeyword'
 	try:
 		return out
 	except:
-		return None
+		#return None
+		return 'Error:%s'%(err) 
 
 # Purpose: Geeft startdate maand (mm)
 def get_startdate_Mm():
@@ -344,10 +411,15 @@ def get_startdate_Mm():
 	if 'STARTDATE' in headerdict: 
 		if len(headerdict['STARTDATE'])>2:
 			out = int(headerdict['STARTDATE'][1])
+		else:
+			err = 'MissingValue'
+	else:
+		err = 'MissingKeyword'
 	try:
 		return out
 	except:
-		return None
+		#return None
+		return 'Error:%s'%(err) 
 
 # Purpose: Geeft startdate dag (dd)
 def get_startdate_Dd():
@@ -356,10 +428,15 @@ def get_startdate_Dd():
 	if 'STARTDATE' in headerdict:
 		if len(headerdict['STARTDATE'])>2:
 			out = int(headerdict['STARTDATE'][2])
+		else:
+			err = 'MissingValue'
+	else:
+		err = 'MissingKeyword'
 	try:
 		return out
 	except:
-		return None
+		#return None
+		return 'Error:%s'%(err) 
 
 # Purpose: Of #XYID aanwezig
 def get_xyid_flag():
@@ -382,10 +459,15 @@ def get_xyid_X():
 	if 'XYID' in headerdict:
 		if len(headerdict['XYID'])>0:
 			out = headerdict['XYID'][1]
+		else:
+			err = 'MissingValue'
+	else:
+		err = 'MissingKeyword'
 	try:
 		return out
 	except:
-		return None
+		#return None
+		return 'Error:%s'%(err) 
 
 # Purpose: Geeft Y coordinaat
 def get_xyid_Y():
@@ -394,10 +476,15 @@ def get_xyid_Y():
 	if 'XYID' in headerdict:
 		if len(headerdict['XYID'])>1:
 			out = headerdict['XYID'][2]
+		else:
+			err = 'MissingValue'
+	else:
+		err = 'MissingKeyword'
 	try:
 		return out
 	except:
-		return None
+		#return None
+		return 'Error:%s'%(err) 
 
 # Purpose: Of #ZID aanwezig
 def get_zid_flag():
@@ -420,10 +507,15 @@ def get_zid_Z():
 	if 'ZID' in headerdict: 
 		if len(headerdict['ZID'])>1:
 			out = headerdict['ZID'][1]
+		else:
+			err = 'MissingValue'
+	else:
+		err = 'MissingKeyword'
 	try:
 		return out
 	except:
-		return None
+		#return None
+		return 'Error:%s'%(err) 
 
 # Purpose: Initialiseren interne geheugenstructuur
 # niet nodig
@@ -457,7 +549,8 @@ def qn2column(i_iQtyNumber):
 					out = j[0]
 		return int(out) 
 	except:
-		return None
+		#return None
+		return 'Error: Index nog niet verwerkt in library' 
 
 # Purpose: Leest een gegeven Gef bestand en zet alle info in een dictionary 
 def read_gef(i_sBestandGef):
@@ -491,7 +584,7 @@ def read_gef(i_sBestandGef):
 				else:
 					keyinfo=None
 				b=keyinfo
-				print 'b: %s'%(b)
+				#print 'b: %s'%(b)
 		                if par in multipars: #tabje hoger gezet zodat conditie alleen geldt als een par bestaat. 2015-10-29
 			        	if is_number(b[0]):
 			        		parno=float(b[0])

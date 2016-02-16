@@ -4,7 +4,7 @@ import ast
 from random import randint
 import pickle
 import re
-import UtlGef
+#import UtlGef
 import Gef2Open,Gef2Config
 
 def randList(cnt):
@@ -16,16 +16,18 @@ def randList(cnt):
 			tel=tel+1
 	return mylst
 
-def tryUtlGef(mytype,functie):
+#def tryUtlGef(mytype,functie):
+def tryUtlGef(functie):
 	try:
-		return eval('%s.%s'%(mytype,functie))
+		#return eval('%s.%s'%(mytype,functie))
+		return eval('UtlGef.%s'%(functie))
 	except:
 		return 'GeenResult'
 
-def try2UtlGef(mytype,functie):
-	myresult = eval('%s.%s'%(mytype,functie))
-	if 'Error:' in myresult:
-		myresult=None
+def tryGef2Open(functie):
+	myResult = eval('Gef2Open.%s'%(functie))
+	if myResult not in [None,False,True] and 'Error:' in str(myResult):
+		myResult=None
 	try:
 		return myResult 
 	except:
@@ -82,8 +84,9 @@ def CompareGefTools(gefbestand,gefnaam,function):
 	try:
 		print 'function: %s'%(function)
 		functieGef2 = ChangetoFunctienaamGef2(function)
-		c2=try2UtlGef('Gef2Open',functieGef2)
-		c3=tryUtlGef('UtlGef',function)
+		c2=tryGef2Open(functieGef2)
+		#c3=tryUtlGef(function)
+		c3='weggelaten'
 		MyVglResult.write('"%s";"%s";"%s";"%s"\n'%(gefnaam,functieGef2,c2,c3))
 		return 'gelukt'
 	except:
@@ -104,15 +107,18 @@ def getBestanden(mylocs):
 			MyGefFiles = open('MyGefFiles.txt','a')
 			if myfile.lower()[-3:]=='gef':
 				mygef=myfile[:-4]
-				myhash = hashlib.md5(open('%s\\%s'%(myloc,myfile),'rb').read()).hexdigest()
+				#myhash = hashlib.md5(open('%s\\%s'%(myloc,myfile),'rb').read()).hexdigest()
+				myhash = hashlib.md5(open('%s/%s'%(myloc,myfile),'rb').read()).hexdigest()
 				if mygef not in mygefs1 and myhash not in myhashes:
 					tel=tel+1
 					mygefs1.append(mygef)
 					myhashes.append(myhash)
 					if tel==1:
-						MyGefFiles.write("'%s':{'gefnaam':'%s','gefloc':'%s\\\\%s','hash':'%s'}"%(mygef,mygef,myloc,myfile,myhash))
+#						MyGefFiles.write("'%s':{'gefnaam':'%s','gefloc':'%s\\\\%s','hash':'%s'}"%(mygef,mygef,myloc,myfile,myhash))
+						MyGefFiles.write("'%s':{'gefnaam':'%s','gefloc':'%s//%s','hash':'%s'}"%(mygef,mygef,myloc,myfile,myhash))
 					else:
-						MyGefFiles.write(",'%s':{'gefnaam':'%s','gefloc':'%s\\\\%s','hash':'%s'}"%(mygef,mygef,myloc,myfile,myhash))
+#						MyGefFiles.write(",'%s':{'gefnaam':'%s','gefloc':'%s\\\\%s','hash':'%s'}"%(mygef,mygef,myloc,myfile,myhash))
+						MyGefFiles.write(",'%s':{'gefnaam':'%s','gefloc':'%s//%s','hash':'%s'}"%(mygef,mygef,myloc,myfile,myhash))
 			MyGefFiles.close()
 	MyGefFiles= open('MyGefFiles.txt','a')
 	MyGefFiles.write('}')
@@ -129,18 +135,18 @@ a=open('MyGefFiles.txt','r')
 mydict=ast.literal_eval(a.readlines()[0])
 a.close()
 gefnaams=[]
-randList=randList(1000)
+randList=randList(40)
 for i in randList:
 	mykey=mydict.keys()[i]
 	gefnaams.append(mykey)
-UtlGef.Init_Gef()
+#UtlGef.Init_Gef()
 for mykey in gefnaams:
 	print 'mykey: %s'%(mykey)
 	myval=mydict[mykey]
 	GefBestand=myval['gefloc']
 	GefNaam=myval['gefnaam']
 	Gef2Open.read_gef(GefBestand)
-	UtlGef.Read_Gef(GefBestand)
+	#UtlGef.Read_Gef(GefBestand)
 	for myFunction in myFunctions:
 			CompareGefTools(GefBestand,GefNaam,myFunction)
 MyVglResult.close()
