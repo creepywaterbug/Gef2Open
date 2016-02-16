@@ -4,7 +4,7 @@ import ast
 from random import randint
 import pickle
 import re
-#import UtlGef
+import UtlGef
 import Gef2Open,Gef2Config
 
 def randList(cnt):
@@ -85,8 +85,7 @@ def CompareGefTools(gefbestand,gefnaam,function):
 		print 'function: %s'%(function)
 		functieGef2 = ChangetoFunctienaamGef2(function)
 		c2=tryGef2Open(functieGef2)
-		#c3=tryUtlGef(function)
-		c3='weggelaten'
+		c3=tryUtlGef(function)
 		MyVglResult.write('"%s";"%s";"%s";"%s"\n'%(gefnaam,functieGef2,c2,c3))
 		return 'gelukt'
 	except:
@@ -139,14 +138,14 @@ randList=randList(40)
 for i in randList:
 	mykey=mydict.keys()[i]
 	gefnaams.append(mykey)
-#UtlGef.Init_Gef()
+UtlGef.Init_Gef()
 for mykey in gefnaams:
 	print 'mykey: %s'%(mykey)
 	myval=mydict[mykey]
 	GefBestand=myval['gefloc']
 	GefNaam=myval['gefnaam']
 	Gef2Open.read_gef(GefBestand)
-	#UtlGef.Read_Gef(GefBestand)
+	UtlGef.Read_Gef(GefBestand)
 	for myFunction in myFunctions:
 			CompareGefTools(GefBestand,GefNaam,myFunction)
 MyVglResult.close()
