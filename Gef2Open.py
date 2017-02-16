@@ -137,7 +137,7 @@ def get_data(i_Kol, iRij):
 	headerdict=ast.literal_eval(pickle.load(fp))
 	if 'datablok' in headerdict:
 		if iRij in headerdict['datablok']:
-			if i_Kol-1 in headerdict['datablok'][iRij]:
+			if len(headerdict['datablok'][iRij]) >= i_Kol - 1:
 				out=headerdict['datablok'][iRij][i_Kol-1]
 			else:
 				err='MissingKol'
