@@ -548,33 +548,26 @@ class Gef2OpenClass:
     def init_gef(self):
         True
 
-    # Purpose: Geeft kolom nummer die correspondeert met gegeven 'quantity
-    #          number', en 0 wanneer deze niet aanwezig.
-    # Note   : Bv, quantity number voor 'gecorrigeerde diepte' is 11.
-    def qn2column(self, i_iQtyNumber):
+    def qn2column(self, i_iQtyNumber, get_corrected_depth=False):
+        """
+        Geeft kolom nummer wat correspondeert met gegeven 'quantity number'.
+        Geeft de corrected depth wanneer gevraagd en aanwezig bij opvragen quantity number = 1 (penetration depth)
+        :param i_iQtyNumber: quantity number volgens GEF definitie
+        :param get_corrected_depth: Wanneer TRUE en i_iQtyNumber = 1 word kolom voor quantity number 11 gezocht
+        :return: index van waarde in data blok
+        """
         try:
-            if i_iQtyNumber == 1:
-                out = 0
-                for i in self.headerdict['COLUMNINFO']:
-                    j = self.headerdict['COLUMNINFO'][i]
-                    if 'sondeerlengte' in str.lower(str(j)):
-                        out = j[0]
-                    if 'penetration length' in str.lower(str(j)):
-                        out = j[0]
-                    if 'diepte bovenkant' in str.lower(str(j)):
-                        out = j[0]
-                    if 'laag van' in str.lower(str(j)):
-                        out = j[0]
-            elif i_iQtyNumber == 11:
-                out = 0
-                for i in self.headerdict['COLUMNINFO']:
-                    j = self.headerdict['COLUMNINFO'][i]
-                    if 'gecorrigeerde diepte' in str.lower(str(j)):
-                        out = j[0]
+            i_iQtyNumber = int(i_iQtyNumber)
+            for key, columninfo in self.headerdict['COLUMNINFO'].iteritems():
+                if int(columninfo[3]) == i_iQtyNumber:
+                    out = key
+                if get_corrected_depth and i_iQtyNumber == 1:
+                    if int(columninfo[3]) == 11:
+                        out = key
             return int(out)
         except:
             # return None
-            return 'Error: Index nog niet verwerkt in library'
+            return 'Error: Quantity Number niet gevonden in GEF file'
 
     # Purpose: Leest een gegeven Gef bestand en zet alle info in een dictionary
     def read_gef(self, i_sBestandGef):
@@ -685,7 +678,7 @@ if __name__ == '__main__':
     # easier to debug using standard Python development tools.
 
     myGef = Gef2OpenClass()
-    myGef.read_gef('GEFTEST01.gef')
+    myGef.read_gef('C:/GIS/1248421/GEFTEST01.gef')
 
     # Variables for testing
     i_Kol = 2
@@ -732,5 +725,14 @@ if __name__ == '__main__':
     print 'qn2column = {}'.format(myGef.qn2column(i_iQtyNumber))
     print 'is_plotable = {}'.format(myGef.is_plotable())
     print 'test_gef = {}'.format(myGef.test_gef(i_sAspect))
+
+    print 'qn2column 1 = {}'.format(myGef.qn2column(1))
+    print 'qn2column 2 = {}'.format(myGef.qn2column(2))
+    print 'qn2column 3 = {}'.format(myGef.qn2column(3))
+    print 'qn2column 6 = {}'.format(myGef.qn2column(6))
+    print 'qn2column 8 = {}'.format(myGef.qn2column(8))
+    print 'qn2column 4 = {}'.format(myGef.qn2column(4))
+    print 'qn2column corrected depth = {}'.format(myGef.qn2column(1, get_corrected_depth=True))
+
     pp.pprint(myGef.headerdict)
 
