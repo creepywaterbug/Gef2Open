@@ -4,9 +4,6 @@
 
 import re
 import os
-import pickle
-import ast
-import sys
 
 
 # Hulpfuncties
@@ -111,6 +108,64 @@ class Gef2OpenClass:
         except:
             return None
 
+    # Purpose: Geeft nodata waarde voor geselecteerde kolom
+    def get_column_void(self, i_Kol):
+        if 'COLUMNVOID' in self.headerdict:
+            if len(self.headerdict['COLUMNVOID']) > i_Kol - 1:
+                out = self.headerdict['COLUMNVOID'][i_Kol][1]
+            else:
+                err = 'MissingValue'
+        else:
+            err = 'MissingKeyword'
+        try:
+            return out
+        except:
+            # return None
+            return 'Error:%s' % (err)
+
+    # Purpose: Of #COLUMNVOID aanwezig
+    def get_column_void_flag(self, i_Kol):
+        if 'COLUMNVOID' in self.headerdict:
+            if len(self.headerdict['COLUMNVOID']) > i_Kol - 1:
+                out = True
+            else:
+                out = False
+        else:
+            out = False
+        try:
+            return out
+        except:
+            return None
+
+    # Purpose: Geeft columninfo terug in een list
+    def get_column_info(self, i_Kol):
+        if 'COLUMNINFO' in self.headerdict:
+            if len(self.headerdict['COLUMNINFO']) > i_Kol - 1:
+                out = self.headerdict['COLUMNINFO'][i_Kol]
+            else:
+                err = 'MissingValue'
+        else:
+            err = 'MissingKeyword'
+        try:
+            return out
+        except:
+            # return None
+            return 'Error:%s' % (err)
+
+    # Purpose: Of #COLUMNINFO aanwezig
+    def get_column_info_flag(self, i_Kol):
+        if 'COLUMNINFO' in self.headerdict:
+            if len(self.headerdict['COLUMNINFO']) > i_Kol - 1:
+                out = True
+            else:
+                out = False
+        else:
+            out = False
+        try:
+            return out
+        except:
+            return None
+
     # Purpose: Geeft company naam
     def get_companyid_Name(self):
         if 'COMPANYID' in self.headerdict:
@@ -143,6 +198,26 @@ class Gef2OpenClass:
         except:
             # return None
             return err
+
+    # TODO continue get_data_iter
+    # Purpose: geeft een iterator met alle waarden voor een bepaalde kolom in een data block
+    def get_data_iter(self, i_Kol):
+        try:
+            if 'datablok' in self.headerdict:
+                if len(self.headerdict['datablok'][1]) >= i_Kol - 1:
+                    void = self.get_column_void(i_Kol)
+                    for i_Rij in range(1, 1 + int(self.get_nr_scans())):
+                        depth = self.get_data(1, i_Rij)
+                        value = self.get_data(i_Kol, i_Rij)
+                        if value == void:  #Replace nodata value for None
+                            value = None
+                        yield (depth, value)
+                else:
+                    err = 'MissingKol'
+            else:
+                err = 'MissingDatablok'
+        except:
+            yield err
 
     # Purpose: Of gegeven #MEASUREMENTTEXT index aanwezig
     def get_measurementtext_flag(self, i_Index):
@@ -473,33 +548,26 @@ class Gef2OpenClass:
     def init_gef(self):
         True
 
-    # Purpose: Geeft kolom nummer die correspondeert met gegeven 'quantity
-    #          number', en 0 wanneer deze niet aanwezig.
-    # Note   : Bv, quantity number voor 'gecorrigeerde diepte' is 11.
-    def qn2column(self, i_iQtyNumber):
+    def qn2column(self, i_iQtyNumber, get_corrected_depth=False):
+        """
+        Geeft kolom nummer wat correspondeert met gegeven 'quantity number'.
+        Geeft de corrected depth wanneer gevraagd en aanwezig bij opvragen quantity number = 1 (penetration depth)
+        :param i_iQtyNumber: quantity number volgens GEF definitie
+        :param get_corrected_depth: Wanneer TRUE en i_iQtyNumber = 1 word kolom voor quantity number 11 gezocht
+        :return: index van waarde in data blok
+        """
         try:
-            if i_iQtyNumber == 1:
-                out = 0
-                for i in self.headerdict['COLUMNINFO']:
-                    j = self.headerdict['COLUMNINFO'][i]
-                    if 'sondeerlengte' in str.lower(str(j)):
-                        out = j[0]
-                    if 'penetration length' in str.lower(str(j)):
-                        out = j[0]
-                    if 'diepte bovenkant' in str.lower(str(j)):
-                        out = j[0]
-                    if 'laag van' in str.lower(str(j)):
-                        out = j[0]
-            elif i_iQtyNumber == 11:
-                out = 0
-                for i in self.headerdict['COLUMNINFO']:
-                    j = self.headerdict['COLUMNINFO'][i]
-                    if 'gecorrigeerde diepte' in str.lower(str(j)):
-                        out = j[0]
+            i_iQtyNumber = int(i_iQtyNumber)
+            for key, columninfo in self.headerdict['COLUMNINFO'].iteritems():
+                if int(columninfo[3]) == i_iQtyNumber:
+                    out = key
+                if get_corrected_depth and i_iQtyNumber == 1:
+                    if int(columninfo[3]) == 11:
+                        out = key
             return int(out)
         except:
             # return None
-            return 'Error: Index nog niet verwerkt in library'
+            return 'Error: Quantity Number niet gevonden in GEF file'
 
     # Purpose: Leest een gegeven Gef bestand en zet alle info in een dictionary
     def read_gef(self, i_sBestandGef):
@@ -538,7 +606,7 @@ class Gef2OpenClass:
                             # print 'b: %s'%(b)
                             if par in multipars:  # tabje hoger gezet zodat conditie alleen geldt als een par bestaat. 2015-10-29
                                 if is_number(b[0]):
-                                    parno = float(b[0])
+                                    parno = int(b[0]) # Gewijzigd in int voor eenvoudiger keys in dictionaries
                                 else:
                                     parno = b[0]
                                 # del keyinfo[0]
@@ -609,9 +677,62 @@ if __name__ == '__main__':
     # This is used for debugging. Using this separated structure makes it much
     # easier to debug using standard Python development tools.
 
-    tool = Gef2OpenClass()
-    tool.read_gef('GEFTEST01.gef')
+    myGef = Gef2OpenClass()
+    myGef.read_gef('C:/GIS/1248421/GEFTEST01.gef')
 
+    # Variables for testing
+    i_Kol = 2
+    iRij = 1
+    i_Index = 1
+    i_iQtyNumber = 1
+    i_sAspect = 1
+
+    # PrettyPrinter for printing dictionary
     import pprint
     pp = pprint.PrettyPrinter(indent=4)
-    pp.pprint(tool.headerdict)
+
+    # Testing all outcome
+    print 'gbr_is_gbr = {}'.format(myGef.gbr_is_gbr())
+    print 'gcr_is_gcr = {}'.format(myGef.gcr_is_gcr())
+    print 'get_companyid_flag = {}'.format(myGef.get_companyid_flag())
+    print 'get_column = {}'.format(myGef.get_column())
+    print 'get_column_flag = {}'.format(myGef.get_column_flag())
+    print 'get_companyid_Name = {}'.format(myGef.get_companyid_Name())
+    print 'get_data = {}'.format(myGef.get_data(i_Kol, iRij))
+    print 'get_data_iter = {}'.format(myGef.get_data_iter(i_Kol))
+    print 'get_measurementtext_flag = {}'.format(myGef.get_measurementtext_flag(i_Index))
+    print 'get_measurementvar_flag = {}'.format(myGef.get_measurementvar_flag(i_Index))
+    print 'get_measurementtext_Tekst = {}'.format(myGef.get_measurementtext_Tekst(i_Index))
+    print 'get_measurementvar_Value = {}'.format(myGef.get_measurementvar_Value(i_Index))
+    print 'get_nr_scans = {}'.format(myGef.get_nr_scans())
+    print 'get_parent_flag = {}'.format(myGef.get_parent_flag())
+    print 'get_parent_reference = {}'.format(myGef.get_parent_reference())
+    print 'get_procedurecode_flag = {}'.format(myGef.get_procedurecode_flag())
+    print 'get_procedurecode_Code = {}'.format(myGef.get_procedurecode_Code())
+    print 'get_projectid_flag = {}'.format(myGef.get_projectid_flag())
+    print 'get_projectid_Number = {}'.format(myGef.get_projectid_Number())
+    print 'get_reportcode_flag = {}'.format(myGef.get_reportcode_flag())
+    print 'get_reportcode_Code = {}'.format(myGef.get_reportcode_Code())
+    print 'get_startdate_flag = {}'.format(myGef.get_startdate_flag())
+    print 'get_startdate_Yyyy = {}'.format(myGef.get_startdate_Yyyy())
+    print 'get_startdate_Mm = {}'.format(myGef.get_startdate_Mm())
+    print 'get_startdate_Dd = {}'.format(myGef.get_startdate_Dd())
+    print 'get_xyid_flag = {}'.format(myGef.get_xyid_flag())
+    print 'get_xyid_X = {}'.format(myGef.get_xyid_X())
+    print 'get_xyid_Y = {}'.format(myGef.get_xyid_Y())
+    print 'get_zid_flag = {}'.format(myGef.get_zid_flag())
+    print 'get_zid_Z = {}'.format(myGef.get_zid_Z())
+    print 'qn2column = {}'.format(myGef.qn2column(i_iQtyNumber))
+    print 'is_plotable = {}'.format(myGef.is_plotable())
+    print 'test_gef = {}'.format(myGef.test_gef(i_sAspect))
+
+    print 'qn2column 1 = {}'.format(myGef.qn2column(1))
+    print 'qn2column 2 = {}'.format(myGef.qn2column(2))
+    print 'qn2column 3 = {}'.format(myGef.qn2column(3))
+    print 'qn2column 6 = {}'.format(myGef.qn2column(6))
+    print 'qn2column 8 = {}'.format(myGef.qn2column(8))
+    print 'qn2column 4 = {}'.format(myGef.qn2column(4))
+    print 'qn2column corrected depth = {}'.format(myGef.qn2column(1, get_corrected_depth=True))
+
+    pp.pprint(myGef.headerdict)
+
